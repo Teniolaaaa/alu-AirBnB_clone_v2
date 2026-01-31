@@ -1,18 +1,17 @@
 #!/usr/bin/python3
-"""This module defines the State class."""
-from models.base_model import BaseModel, Base
+"""State module."""
+from os import getenv
 from sqlalchemy import Column, String
 from sqlalchemy.orm import relationship
-from os import getenv
+from models.base_model import BaseModel, Base
 
 
 class State(BaseModel, Base):
-    """State class for the states table."""
-
-    __tablename__ = "states"
-    name = Column(String(128), nullable=False)
+    """State class."""
 
     if getenv("HBNB_TYPE_STORAGE") == "db":
+        __tablename__ = "states"
+        name = Column(String(128), nullable=False)
         cities = relationship("City", backref="state",
                               cascade="all, delete-orphan")
     else:
@@ -20,11 +19,11 @@ class State(BaseModel, Base):
 
         @property
         def cities(self):
-            """Get cities for this state."""
-            import models
+            """Return cities for this state."""
+            from models import storage
             from models.city import City
             city_list = []
-            for city in models.storage.all(City).values():
+            for city in storage.all(City).values():
                 if city.state_id == self.id:
                     city_list.append(city)
             return city_list
