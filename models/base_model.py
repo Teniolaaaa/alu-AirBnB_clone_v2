@@ -1,129 +1,67 @@
 #!/usr/bin/python3
-"""
-BaseModel module for the AirBnB clone project.
-
-This module defines the BaseModel class which serves as the foundation
-for all other model classes in the project. It provides common attributes
-and methods for serialization, deserialization, and database mapping.
-"""
+"""This module defines the BaseModel class."""
 import uuid
 from datetime import datetime
-import models
 from sqlalchemy import Column, String, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 
-# Create the declarative base for SQLAlchemy ORM mapping
-# Note: BaseModel does NOT inherit from Base
 Base = declarative_base()
 
 
 class BaseModel:
-    """
-    Base class for all models in the AirBnB clone project.
+    """Base class for all models."""
 
-    This class provides common functionality including:
-    - Unique ID generation
-    - Timestamp management (created_at, updated_at)
-    - Serialization to dictionary format
-    - Integration with storage engines
-
-    Attributes:
-        id (str): Unique identifier for each instance
-        created_at (datetime): Timestamp when instance was created
-        updated_at (datetime): Timestamp when instance was last updated
-    """
-
-    # SQLAlchemy column definitions for database mapping
     id = Column(String(60), primary_key=True, nullable=False)
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
     updated_at = Column(DateTime, nullable=False, default=datetime.utcnow)
 
     def __init__(self, *args, **kwargs):
-        """
-        Initialize a new BaseModel instance.
-
-        Args:
-            *args: Variable length argument list (not used)
-            **kwargs: Keyword arguments for setting instance attributes
-
-        If kwargs is provided, attributes are set from the dictionary.
-        Special handling for 'created_at' and 'updated_at' to convert
-        string representations to datetime objects.
-        """
+        """Initialize a new BaseModel instance."""
         if kwargs:
-            # Set attributes from kwargs dictionary
             for key, value in kwargs.items():
                 if key == "__class__":
                     continue
-                elif key in ("created_at", "updated_at"):
+                if key in ("created_at", "updated_at"):
                     if isinstance(value, str):
-                        fmt = "%Y-%m-%dT%H:%M:%S.%f"
-                        value = datetime.strptime(value, fmt)
+                        value = datetime.strptime(value,
+                                                  "%Y-%m-%dT%H:%M:%S.%f")
                 setattr(self, key, value)
-
-            # Ensure id exists
             if "id" not in kwargs:
                 self.id = str(uuid.uuid4())
-
-            # Ensure timestamps exist
             if "created_at" not in kwargs:
                 self.created_at = datetime.utcnow()
             if "updated_at" not in kwargs:
                 self.updated_at = datetime.utcnow()
         else:
-            # Create new instance with generated values
             self.id = str(uuid.uuid4())
             self.created_at = datetime.utcnow()
             self.updated_at = datetime.utcnow()
 
     def __str__(self):
-        """
-        Return a string representation of the instance.
-
-        Returns:
-            str: Formatted string showing class name, id, and attributes
-        """
-        my_dict = self.__dict__.copy()
-        if "_sa_instance_state" in my_dict:
-            del my_dict["_sa_instance_state"]
-        return "[{}] ({}) {}".format(self.__class__.__name__, self.id, my_dict)
+        """Return string representation of the instance."""
+        d = self.__dict__.copy()
+        d.pop("_sa_instance_state", None)
+        return "[{}] ({}) {}".format(self.__class__.__name__, self.id, d)
 
     def save(self):
-        """
-        Save the current instance to storage.
-
-        Updates the 'updated_at' timestamp and persists the instance
-        to the active storage engine (file or database).
-        """
+        """Save the instance to storage."""
+        import models
         self.updated_at = datetime.utcnow()
         models.storage.new(self)
         models.storage.save()
 
     def to_dict(self):
-        """
-        Convert the instance to a dictionary representation.
-
-        Returns:
-            dict: Dictionary containing all instance attributes,
-                  with datetime objects converted to ISO format strings
-                  and __class__ key added for reconstruction.
-        """
+        """Convert instance to dictionary."""
         result = self.__dict__.copy()
         result["__class__"] = self.__class__.__name__
-
         if "created_at" in result:
             result["created_at"] = result["created_at"].isoformat()
         if "updated_at" in result:
             result["updated_at"] = result["updated_at"].isoformat()
-
-        # Remove SQLAlchemy internal state if present
-        if "_sa_instance_state" in result:
-            del result["_sa_instance_state"]
-
+        result.pop("_sa_instance_state", None)
         return result
 
     def delete(self):
-        """
-        Delete the current instance from storage.
-        """
+        """Delete the instance from storage."""
+        import models
         models.storage.delete(self)
