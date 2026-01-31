@@ -17,9 +17,11 @@ class State(BaseModel, Base):
         cities = relationship("City", backref="state",
                               cascade="all, delete-orphan")
     else:
+        name = ""
+
         @property
         def cities(self):
-            """Get list of City instances with state_id equals to self.id."""
+            """Get list of City instances with state_id equals self.id."""
             import models
             from models.city import City
             city_list = []
