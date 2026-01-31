@@ -25,17 +25,14 @@ class City(BaseModel, Base):
         places (relationship): SQLAlchemy relationship to Place objects
     """
 
-    # Database table name
     __tablename__ = "cities"
 
-    # Column definitions for database storage
     state_id = Column(String(60), ForeignKey("states.id"), nullable=False)
     name = Column(String(128), nullable=False)
 
-    # Relationship to places - only for database storage
     if getenv("HBNB_TYPE_STORAGE") == "db":
         places = relationship(
             "Place",
             backref="cities",
-            cascade="all, delete-orphan"
+            cascade="all, delete, delete-orphan"
         )

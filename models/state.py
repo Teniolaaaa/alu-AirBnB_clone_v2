@@ -6,6 +6,7 @@ This module defines the State class which represents a geographical state
 or region. States contain cities and are a fundamental part of the
 location hierarchy in the application.
 """
+import models
 from os import getenv
 from sqlalchemy import Column, String
 from sqlalchemy.orm import relationship
@@ -25,21 +26,17 @@ class State(BaseModel, Base):
         cities (relationship): SQLAlchemy relationship to City objects
     """
 
-    # Database table name
     __tablename__ = "states"
 
-    # Column definition for database storage
     name = Column(String(128), nullable=False)
 
-    # Relationship to cities - only for database storage
     if getenv("HBNB_TYPE_STORAGE") == "db":
         cities = relationship(
             "City",
             backref="state",
-            cascade="all, delete-orphan"
+            cascade="all, delete, delete-orphan"
         )
     else:
-        # For file storage, use a property to get related cities
         @property
         def cities(self):
             """
@@ -48,10 +45,9 @@ class State(BaseModel, Base):
             Returns:
                 list: List of City instances belonging to this state
             """
-            from models import storage
             from models.city import City
             city_list = []
-            all_cities = storage.all(City)
+            all_cities = models.storage.all(City)
             for city in all_cities.values():
                 if city.state_id == self.id:
                     city_list.append(city)

@@ -8,10 +8,12 @@ and methods for serialization, deserialization, and database mapping.
 """
 import uuid
 from datetime import datetime
+import models
 from sqlalchemy import Column, String, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 
 # Create the declarative base for SQLAlchemy ORM mapping
+# Note: BaseModel does NOT inherit from Base
 Base = declarative_base()
 
 
@@ -52,10 +54,8 @@ class BaseModel:
             # Set attributes from kwargs dictionary
             for key, value in kwargs.items():
                 if key == "__class__":
-                    # Skip the __class__ key as it shouldn't be an attribute
                     continue
                 elif key in ("created_at", "updated_at"):
-                    # Convert string timestamps to datetime objects
                     if isinstance(value, str):
                         value = datetime.strptime(value, "%Y-%m-%dT%H:%M:%S.%f")
                 setattr(self, key, value)
@@ -82,8 +82,10 @@ class BaseModel:
         Returns:
             str: Formatted string showing class name, id, and attributes
         """
-        class_name = self.__class__.__name__
-        return "[{}] ({}) {}".format(class_name, self.id, self.__dict__)
+        my_dict = self.__dict__.copy()
+        if "_sa_instance_state" in my_dict:
+            del my_dict["_sa_instance_state"]
+        return "[{}] ({}) {}".format(self.__class__.__name__, self.id, my_dict)
 
     def save(self):
         """
@@ -92,10 +94,9 @@ class BaseModel:
         Updates the 'updated_at' timestamp and persists the instance
         to the active storage engine (file or database).
         """
-        from models import storage
         self.updated_at = datetime.utcnow()
-        storage.new(self)
-        storage.save()
+        models.storage.new(self)
+        models.storage.save()
 
     def to_dict(self):
         """
@@ -106,13 +107,9 @@ class BaseModel:
                   with datetime objects converted to ISO format strings
                   and __class__ key added for reconstruction.
         """
-        # Create a copy of the instance dictionary
         result = self.__dict__.copy()
-
-        # Add the class name for reconstruction
         result["__class__"] = self.__class__.__name__
 
-        # Convert datetime objects to ISO format strings
         if "created_at" in result:
             result["created_at"] = result["created_at"].isoformat()
         if "updated_at" in result:
@@ -127,8 +124,5 @@ class BaseModel:
     def delete(self):
         """
         Delete the current instance from storage.
-
-        Removes the instance from the active storage engine.
         """
-        from models import storage
-        storage.delete(self)
+        models.storage.delete(self)

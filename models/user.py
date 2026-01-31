@@ -28,24 +28,21 @@ class User(BaseModel, Base):
         reviews (relationship): Reviews written by the user
     """
 
-    # Database table name
     __tablename__ = "users"
 
-    # Column definitions for database storage
     email = Column(String(128), nullable=False)
     password = Column(String(128), nullable=False)
     first_name = Column(String(128), nullable=True)
     last_name = Column(String(128), nullable=True)
 
-    # Relationships - only for database storage
     if getenv("HBNB_TYPE_STORAGE") == "db":
         places = relationship(
             "Place",
             backref="user",
-            cascade="all, delete-orphan"
+            cascade="all, delete, delete-orphan"
         )
         reviews = relationship(
             "Review",
             backref="user",
-            cascade="all, delete-orphan"
+            cascade="all, delete, delete-orphan"
         )

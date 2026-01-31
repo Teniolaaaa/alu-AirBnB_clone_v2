@@ -5,13 +5,13 @@ Place module for the AirBnB clone project.
 This module defines the Place class which represents a rental property
 in the application. Places are the core entities that users can rent.
 """
+import models
 from os import getenv
 from sqlalchemy import Column, String, Integer, Float, ForeignKey, Table
 from sqlalchemy.orm import relationship
 from models.base_model import BaseModel, Base
 
 # Many-to-Many relationship table between Place and Amenity
-# This table links places to their amenities
 place_amenity = Table(
     "place_amenity",
     Base.metadata,
@@ -55,10 +55,8 @@ class Place(BaseModel, Base):
         amenity_ids (list): List of Amenity IDs (for file storage)
     """
 
-    # Database table name
     __tablename__ = "places"
 
-    # Column definitions for database storage
     city_id = Column(String(60), ForeignKey("cities.id"), nullable=False)
     user_id = Column(String(60), ForeignKey("users.id"), nullable=False)
     name = Column(String(128), nullable=False)
@@ -70,15 +68,13 @@ class Place(BaseModel, Base):
     latitude = Column(Float, nullable=True)
     longitude = Column(Float, nullable=True)
 
-    # For file storage mode
     amenity_ids = []
 
     if getenv("HBNB_TYPE_STORAGE") == "db":
-        # Database storage relationships
         reviews = relationship(
             "Review",
             backref="place",
-            cascade="all, delete-orphan"
+            cascade="all, delete, delete-orphan"
         )
         amenities = relationship(
             "Amenity",
@@ -87,7 +83,6 @@ class Place(BaseModel, Base):
             backref="place_amenities"
         )
     else:
-        # File storage property getters
         @property
         def reviews(self):
             """
@@ -96,10 +91,9 @@ class Place(BaseModel, Base):
             Returns:
                 list: List of Review instances for this place
             """
-            from models import storage
             from models.review import Review
             review_list = []
-            all_reviews = storage.all(Review)
+            all_reviews = models.storage.all(Review)
             for review in all_reviews.values():
                 if review.place_id == self.id:
                     review_list.append(review)
@@ -113,10 +107,9 @@ class Place(BaseModel, Base):
             Returns:
                 list: List of Amenity instances linked to this place
             """
-            from models import storage
             from models.amenity import Amenity
             amenity_list = []
-            all_amenities = storage.all(Amenity)
+            all_amenities = models.storage.all(Amenity)
             for amenity in all_amenities.values():
                 if amenity.id in self.amenity_ids:
                     amenity_list.append(amenity)

@@ -20,11 +20,8 @@ class Amenity(BaseModel, Base):
     Attributes:
         __tablename__ (str): Database table name for SQLAlchemy
         name (str): The name of the amenity
-        place_amenities (relationship): Back-reference to places with this amenity
     """
 
-    # Database table name
     __tablename__ = "amenities"
 
-    # Column definition for database storage
     name = Column(String(128), nullable=False)
