@@ -80,7 +80,7 @@ class TestUserAttributes(unittest.TestCase):
     def test_instantiation_with_kwargs(self):
         """Test User instantiation with keyword arguments."""
         user = User(email="test@example.com", password="pwd",
-                   first_name="John", last_name="Doe")
+                    first_name="John", last_name="Doe")
         self.assertEqual(user.email, "test@example.com")
         self.assertEqual(user.password, "pwd")
         self.assertEqual(user.first_name, "John")

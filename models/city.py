@@ -33,6 +33,6 @@ class City(BaseModel, Base):
     if getenv("HBNB_TYPE_STORAGE") == "db":
         places = relationship(
             "Place",
-            backref="cities",
+            backref="city",
             cascade="all, delete, delete-orphan"
         )

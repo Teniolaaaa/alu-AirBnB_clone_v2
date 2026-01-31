@@ -57,7 +57,8 @@ class BaseModel:
                     continue
                 elif key in ("created_at", "updated_at"):
                     if isinstance(value, str):
-                        value = datetime.strptime(value, "%Y-%m-%dT%H:%M:%S.%f")
+                        fmt = "%Y-%m-%dT%H:%M:%S.%f"
+                        value = datetime.strptime(value, fmt)
                 setattr(self, key, value)
 
             # Ensure id exists

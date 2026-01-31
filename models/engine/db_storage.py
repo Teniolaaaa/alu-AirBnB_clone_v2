@@ -52,8 +52,8 @@ class DBStorage:
         database = getenv("HBNB_MYSQL_DB")
         env = getenv("HBNB_ENV")
 
-        # Create the database connection URL (using pymysql driver)
-        db_url = "mysql+pymysql://{}:{}@{}/{}".format(
+        # Create the database connection URL
+        db_url = "mysql+mysqldb://{}:{}@{}/{}".format(
             user, password, host, database
         )
 
@@ -142,8 +142,7 @@ class DBStorage:
         )
 
         # Create a thread-safe scoped session
-        Session = scoped_session(session_factory)
-        self.__session = Session()
+        self.__session = scoped_session(session_factory)
 
     def close(self):
         """
@@ -151,4 +150,4 @@ class DBStorage:
 
         Removes the current session, releasing database resources.
         """
-        self.__session.close()
+        self.__session.remove()

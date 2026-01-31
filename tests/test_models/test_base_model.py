@@ -66,7 +66,8 @@ class TestBaseModelInstantiation(unittest.TestCase):
         """Test that args are ignored when kwargs are present."""
         dt = datetime.now()
         dt_iso = dt.isoformat()
-        model = BaseModel("12345", id="123", created_at=dt_iso, updated_at=dt_iso)
+        model = BaseModel("12345", id="123",
+                          created_at=dt_iso, updated_at=dt_iso)
         self.assertEqual(model.id, "123")
 
 
@@ -141,7 +142,7 @@ class TestBaseModelToDict(unittest.TestCase):
         model_dict = model.to_dict()
         # ISO format: YYYY-MM-DDTHH:MM:SS.ffffff
         self.assertRegex(model_dict["created_at"],
-                        r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+")
+                         r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+")
 
     def test_to_dict_output_differs_from_dunder_dict(self):
         """Test that to_dict() output differs from __dict__."""
