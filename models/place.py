@@ -1,9 +1,9 @@
 #!/usr/bin/python3
 """This module defines the Place class."""
-from os import getenv
+from models.base_model import BaseModel, Base
 from sqlalchemy import Column, String, Integer, Float, ForeignKey, Table
 from sqlalchemy.orm import relationship
-from models.base_model import BaseModel, Base
+from os import getenv
 
 
 if getenv("HBNB_TYPE_STORAGE") == "db":
@@ -21,7 +21,6 @@ class Place(BaseModel, Base):
     """Place class for the places table."""
 
     __tablename__ = "places"
-
     city_id = Column(String(60), ForeignKey("cities.id"), nullable=False)
     user_id = Column(String(60), ForeignKey("users.id"), nullable=False)
     name = Column(String(128), nullable=False)
@@ -54,7 +53,7 @@ class Place(BaseModel, Base):
 
         @property
         def reviews(self):
-            """Get list of Review instances with place_id equals self.id."""
+            """Get reviews for this place."""
             import models
             from models.review import Review
             review_list = []
@@ -65,7 +64,7 @@ class Place(BaseModel, Base):
 
         @property
         def amenities(self):
-            """Get list of Amenity instances linked to this Place."""
+            """Get amenities for this place."""
             import models
             from models.amenity import Amenity
             amenity_list = []
@@ -76,7 +75,7 @@ class Place(BaseModel, Base):
 
         @amenities.setter
         def amenities(self, obj):
-            """Add an Amenity to the Place."""
+            """Add an amenity to this place."""
             from models.amenity import Amenity
             if isinstance(obj, Amenity):
                 self.amenity_ids.append(obj.id)

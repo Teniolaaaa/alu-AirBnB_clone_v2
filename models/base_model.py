@@ -19,13 +19,12 @@ class BaseModel:
         """Initialize a new BaseModel instance."""
         if kwargs:
             for key, value in kwargs.items():
-                if key == "__class__":
-                    continue
-                if key in ("created_at", "updated_at"):
-                    if isinstance(value, str):
-                        value = datetime.strptime(value,
-                                                  "%Y-%m-%dT%H:%M:%S.%f")
-                setattr(self, key, value)
+                if key != "__class__":
+                    if key in ("created_at", "updated_at"):
+                        if isinstance(value, str):
+                            value = datetime.strptime(
+                                value, "%Y-%m-%dT%H:%M:%S.%f")
+                    setattr(self, key, value)
             if "id" not in kwargs:
                 self.id = str(uuid.uuid4())
             if "created_at" not in kwargs:
@@ -54,9 +53,11 @@ class BaseModel:
         """Convert instance to dictionary."""
         result = self.__dict__.copy()
         result["__class__"] = self.__class__.__name__
-        if "created_at" in result:
+        if "created_at" in result and isinstance(result["created_at"],
+                                                 datetime):
             result["created_at"] = result["created_at"].isoformat()
-        if "updated_at" in result:
+        if "updated_at" in result and isinstance(result["updated_at"],
+                                                 datetime):
             result["updated_at"] = result["updated_at"].isoformat()
         result.pop("_sa_instance_state", None)
         return result

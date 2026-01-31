@@ -1,13 +1,6 @@
 #!/usr/bin/python3
 """This module defines the FileStorage class."""
 import json
-from models.base_model import BaseModel
-from models.state import State
-from models.city import City
-from models.user import User
-from models.place import Place
-from models.review import Review
-from models.amenity import Amenity
 
 
 class FileStorage:
@@ -47,6 +40,14 @@ class FileStorage:
 
     def reload(self):
         """Load objects from JSON file."""
+        from models.base_model import BaseModel
+        from models.state import State
+        from models.city import City
+        from models.user import User
+        from models.place import Place
+        from models.review import Review
+        from models.amenity import Amenity
+
         classes = {
             "BaseModel": BaseModel,
             "State": State,

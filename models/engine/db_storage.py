@@ -4,12 +4,6 @@ from os import getenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 from models.base_model import Base
-from models.state import State
-from models.city import City
-from models.user import User
-from models.place import Place
-from models.review import Review
-from models.amenity import Amenity
 
 
 class DBStorage:
@@ -24,7 +18,6 @@ class DBStorage:
         password = getenv("HBNB_MYSQL_PWD")
         host = getenv("HBNB_MYSQL_HOST", "localhost")
         database = getenv("HBNB_MYSQL_DB")
-        env = getenv("HBNB_ENV")
 
         db_url = "mysql+mysqldb://{}:{}@{}/{}".format(
             user, password, host, database
@@ -32,11 +25,18 @@ class DBStorage:
 
         self.__engine = create_engine(db_url, pool_pre_ping=True)
 
-        if env == "test":
+        if getenv("HBNB_ENV") == "test":
             Base.metadata.drop_all(self.__engine)
 
     def all(self, cls=None):
         """Query all objects from the database."""
+        from models.state import State
+        from models.city import City
+        from models.user import User
+        from models.place import Place
+        from models.review import Review
+        from models.amenity import Amenity
+
         classes = [State, City, User, Place, Review, Amenity]
         objects = {}
 
@@ -72,6 +72,13 @@ class DBStorage:
 
     def reload(self):
         """Create all tables and initialize session."""
+        from models.state import State
+        from models.city import City
+        from models.user import User
+        from models.place import Place
+        from models.review import Review
+        from models.amenity import Amenity
+
         Base.metadata.create_all(self.__engine)
         session_factory = sessionmaker(bind=self.__engine,
                                        expire_on_commit=False)
