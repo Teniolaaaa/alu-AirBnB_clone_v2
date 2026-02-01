@@ -3,8 +3,7 @@
 This is the second version of the AirBnB clone project, featuring MySQL database integration using SQLAlchemy ORM.
 
 ## Team Members
-- Shakilla Uwamahoro
-- Teniola Olaleye
+- Darlene Ayinkamiye
 
 ## Description
 
@@ -97,12 +96,8 @@ HBNB_ENV=test HBNB_MYSQL_USER=hbnb_test HBNB_MYSQL_PWD=hbnb_test_pwd HBNB_MYSQL_
 └── tests/                  # Unit tests
 ```
 
-## Authors
-
-Original Authors:
-- Ezra Nobrega
-- Justin Majetich
 
 Project Contributors:
-- Shakilla Uwamahoro
+-
 - Teniola Olaleye
+ Shakilla Uwamahoro
