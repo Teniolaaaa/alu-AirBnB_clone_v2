@@ -1,6 +1,10 @@
 #!/usr/bin/python3
-"""This module instantiates an object of class FileStorage or DBStorage"""
+"""
+initialize the models package
+"""
+
 from os import getenv
+
 
 storage_t = getenv("HBNB_TYPE_STORAGE")
 
