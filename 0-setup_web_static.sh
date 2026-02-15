@@ -10,30 +10,23 @@ mkdir -p /data/web_static/releases/test/
 mkdir -p /data/web_static/shared/
 
 # Create a fake HTML file for testing
-cat > /data/web_static/releases/test/index.html << 'EOF'
-<html>
+echo "<html>
   <head>
   </head>
   <body>
     Holberton School
   </body>
-</html>
-EOF
+</html>" > /data/web_static/releases/test/index.html
 
 # Create symbolic link (delete if exists, then recreate)
-ln -sf /data/web_static/releases/test/ /data/web_static/current
+rm -rf /data/web_static/current
+ln -s /data/web_static/releases/test/ /data/web_static/current
 
 # Give ownership of /data/ to ubuntu user and group recursively
 chown -R ubuntu:ubuntu /data/
 
 # Update Nginx configuration to serve web_static content
-nginx_config="/etc/nginx/sites-available/default"
-
-# Check if the location block already exists
-if ! grep -q "location /hbnb_static" "$nginx_config"; then
-    # Add location block for hbnb_static before the first location block
-    sed -i '/server_name _;/a \\n\tlocation /hbnb_static {\n\t\talias /data/web_static/current/;\n\t\tautoindex off;\n\t}' "$nginx_config"
-fi
+sed -i '/listen 80 default_server;/a \\tlocation /hbnb_static {\n\t\talias /data/web_static/current/;\n\t}' /etc/nginx/sites-enabled/default
 
 # Restart Nginx to apply changes
 service nginx restart
